@@ -1,0 +1,16 @@
+streamlit
+yfinance
+pandas
+numpy
+datetime
+plotly
+matplotlib
+python-dotenv
+cufflinks
+alpha_vantage
+stocknews
+pandas_ta
+newsapi-python
+newsdataapi
+streamlit-extras
+prophet
