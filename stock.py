@@ -19,7 +19,9 @@ from stock_prediction import get_prediction, get_charts
 load_dotenv(".env")
 
 ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_KEY")
+st.set_page_config(page_title='Stock Analysis', page_icon=':moneybag:', initial_sidebar_state='expanded')
 # select country
+st.sidebar.header('Stock Analysis')
 country = st.sidebar.radio('Country', ['USA', 'India'],horizontal=True)
 tickerSymbol = st.sidebar.selectbox("Select Stock", get_ticker(country))
 
@@ -31,29 +33,30 @@ if country == 'India':
     indianTickerData = get_indian_stock(tickerSymbol,startDate=start_date,endDate=end_date)
     name = (get_ticker_name(tickerSymbol))
     st.header(name)
-    fig = px.line(indianTickerData, x=indianTickerData.index, y=indianTickerData['Last Price'], title=f'{tickerSymbol}'                                                                                                f' Stock Price')
-    st.plotly_chart(fig)
-    st.header('**Bollinger Bands**')
-    qf=cf.QuantFig(indianTickerData,title='First Quant Figure',legend='top',name='GS')
-    qf.add_bollinger_bands()
-    fig = qf.iplot(asFigure=True)
-    st.plotly_chart(fig)
 
-    pricing_data, news, tech_indicator, predicted_stock = st.tabs(["Pricing Data","News", "Technical Analysis",
-                                                                   "Predicted Stock Price"])
+    home, pricing_data, news, tech_indicator, predicted_stock = st.tabs(["Home", "Pricing Data", "News",
+                                                                         "Technical Analysis",
+                                                                         "Predicted Stock Price"])
+    with home:
+        fig = px.line(indianTickerData, x=indianTickerData.index, y=indianTickerData['Last Price'], title=f'{tickerSymbol}'                                                                                                f' Stock Price')
+        st.plotly_chart(fig)
+        st.header('**Bollinger Bands**')
+        qf=cf.QuantFig(indianTickerData,title='First Quant Figure',legend='top',name='GS')
+        qf.add_bollinger_bands()
+        fig = qf.iplot(asFigure=True)
+        st.plotly_chart(fig)
 
     with pricing_data:
-        with pricing_data:
-            st.header('Pricing Movements')
-            data2 = indianTickerData
-            data2['% Change'] = indianTickerData['Last Price'] / indianTickerData['Last Price'].shift(1) - 1
-            data2.dropna(inplace=True)
-            st.write(data2)
-            annual_return = data2['% Change'].mean() * 252 * 100
-            st.write('Annual return : ', annual_return, '%')
-            stdev = np.std(data2['% Change']) * np.sqrt(252) * 100
-            st.write('Standard Deviation : ', stdev, '%')
-            st.write('Risk Adj return : ', annual_return / stdev)
+        st.header('Pricing Movements')
+        data2 = indianTickerData
+        data2['% Change'] = indianTickerData['Last Price'] / indianTickerData['Last Price'].shift(1) - 1
+        data2.dropna(inplace=True)
+        st.write(data2)
+        annual_return = data2['% Change'].mean() * 252 * 100
+        st.write('Annual return : ', annual_return, '%')
+        stdev = np.std(data2['% Change']) * np.sqrt(252) * 100
+        st.write('Standard Deviation : ', stdev, '%')
+        st.write('Risk Adj return : ', annual_return / stdev)
 
     with news:
         st.header('News')
@@ -104,20 +107,20 @@ else:
         string_summary = tickerData2.info['longBusinessSummary']
         st.info(string_summary)
 
-    fig= px.line(tickerData, x=tickerData.index, y=tickerData['Adj Close'], title=f'{tickerSymbol} Stock Price')
-    st.plotly_chart(fig)
+    home, pricing_data, fundamental_data, news, tech_indicator, predicted_stock = st.tabs(["Home","Pricing Data",
+                                                                                           "Fundamental Data",
+                                                                                           "News",
+                                                                                           "Technical Analysis",
+                                                                                           "Predicted Stock Price"])
+    with home:
+        fig= px.line(tickerData, x=tickerData.index, y=tickerData['Adj Close'], title=f'{tickerSymbol} Stock Price')
+        st.plotly_chart(fig)
 
-    st.header('**Bollinger Bands**')
-    qf=cf.QuantFig(tickerData,title='First Quant Figure',legend='top',name='GS')
-    qf.add_bollinger_bands()
-    fig = qf.iplot(asFigure=True)
-    st.plotly_chart(fig)
-
-    pricing_data, fundamental_data, news, tech_indicator, predicted_stock = st.tabs(["Pricing Data",
-                                                                                     "Fundamental Data",
-                                                                                     "News",
-                                                                                     "Technical Analysis",
-                                                                                     "Predicted Stock Price"])
+        st.header('**Bollinger Bands**')
+        qf=cf.QuantFig(tickerData,title='First Quant Figure',legend='top',name='GS')
+        qf.add_bollinger_bands()
+        fig = qf.iplot(asFigure=True)
+        st.plotly_chart(fig)
 
     with pricing_data:
         st.header('Pricing Movements')
